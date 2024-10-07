@@ -3,6 +3,7 @@ from collections import defaultdict
 from string import ascii_lowercase
 
 import torch
+from pyctcdecode import Alphabet, BeamSearchDecoderCTC
 
 # TODO add CTC decode
 # TODO add BPE, LM, Beam Search support
@@ -29,6 +30,7 @@ class CTCTextEncoder:
 
         self.ind2char = dict(enumerate(self.vocab))
         self.char2ind = {v: k for k, v in self.ind2char.items()}
+        self.decoder_bs = BeamSearchDecoderCTC(Alphabet(self.vocab, False), None)
 
     def __len__(self):
         return len(self.vocab)
@@ -72,7 +74,7 @@ class CTCTextEncoder:
             last_char = cur_char
         return "".join(decoded)
 
-    def ctc_beam_search_decode(self, probs, beam_size):
+    def ctc_beam_search_decode_slow(self, probs, beam_size):
         dp = {
             ("", self.EMPTY_TOK): 1.0,
         }
@@ -100,6 +102,10 @@ class CTCTextEncoder:
                         new_prefix = prefix
                 new_dp[(new_prefix, cur_char)] += v * next_token_prob
         return new_dp
+
+    def ctc_beam_search_decode(self, probs, beam_size=5):
+        probs = probs.detach().cpu().numpy()
+        return self.decoder_bs.decode(probs, beam_size)
 
     def _truncate_paths(self, dp, beam_size):
         return dict(sorted(list(dp.items(), key=lambda x: -x[1]))[:beam_size])

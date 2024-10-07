@@ -103,30 +103,35 @@ class Trainer(BaseTrainer):
         ]
         argmax_texts_raw = [self.text_encoder.decode(inds) for inds in argmax_inds]
         argmax_texts = [self.text_encoder.ctc_decode(inds) for inds in argmax_inds]
-        tuples = list(zip(argmax_texts, text, argmax_texts_raw, audio_path))
+
+        beam_search_results = [
+            self.text_encoder.ctc_beam_search_decode(prob)[0] for prob in log_probs
+        ]
+
+        tuples = list(
+            zip(argmax_texts, beam_search_results, text, argmax_texts_raw, audio_path)
+        )
 
         rows = {}
-        for pred, target, raw_pred, audio_path in tuples[:examples_to_log]:
+        for pred, pred_beam, target, raw_pred, audio_path in tuples[:examples_to_log]:
             target = self.text_encoder.normalize_text(target)
             wer = calc_wer(target, pred) * 100
             cer = calc_cer(target, pred) * 100
 
-            print(
-                {
-                    "target": target,
-                    "raw prediction": raw_pred,
-                    "predictions": pred,
-                    "wer": wer,
-                    "cer": cer,
-                }
-            )
+            wer_beam_search = calc_wer(target, pred_beam) * 100
+            cer_beam_search = calc_cer(target, pred_beam) * 100
+
             rows[Path(audio_path).name] = {
                 "target": target,
                 "raw prediction": raw_pred,
-                "predictions": pred,
-                "wer": wer,
-                "cer": cer,
+                "predictions(Argmax)": pred,
+                "predictions(Beam Search)": pred_beam,
+                "wer(Argmax)": wer,
+                "cer(Argmax)": cer,
+                "wer(Beam Search)": wer_beam_search,
+                "cer(Beam Search)": cer_beam_search,
             }
+
         self.writer.add_table(
             "predictions", pd.DataFrame.from_dict(rows, orient="index")
         )
