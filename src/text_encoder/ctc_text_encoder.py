@@ -59,15 +59,17 @@ class CTCTextEncoder:
         """
         return "".join([self.ind2char[int(ind)] for ind in inds]).strip()
 
+    # from seminar
     def ctc_decode(self, inds) -> str:
         decoded = []
         last_char = self.EMPTY_TOK
         for ind in inds:
-            if last_char == self.ind2char[ind]:
+            cur_char = self.ind2char[ind]
+            if cur_char == self.EMPTY_TOK:
                 continue
-            if last_char != self.EMPTY_TOK:
-                decoded.append(self.ind2char[ind])
-            last_char = self.ind2char[ind]
+            if cur_char != last_char:
+                decoded.append(cur_char)
+            last_char = cur_char
         return "".join(decoded)
 
     def ctc_beam_search_decode(self, probs, beam_size):
