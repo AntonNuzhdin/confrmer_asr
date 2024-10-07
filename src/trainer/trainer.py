@@ -105,7 +105,8 @@ class Trainer(BaseTrainer):
         argmax_texts = [self.text_encoder.ctc_decode(inds) for inds in argmax_inds]
 
         beam_search_results = [
-            self.text_encoder.ctc_beam_search_decode(prob) for prob in log_probs
+            self.text_encoder.ctc_beam_search_decode(prob[:len])
+            for prob, len in zip(log_probs, log_probs_length)
         ]
 
         tuples = list(
