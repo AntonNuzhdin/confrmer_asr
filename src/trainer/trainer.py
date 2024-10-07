@@ -121,6 +121,7 @@ class Trainer(BaseTrainer):
             wer_beam_search = calc_wer(target, pred_beam) * 100
             cer_beam_search = calc_cer(target, pred_beam) * 100
 
+            print(pred_beam)
             rows[Path(audio_path).name] = {
                 "target": target,
                 "raw prediction": raw_pred,
