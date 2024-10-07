@@ -45,6 +45,6 @@ class BeamSearchCERMetric(BaseMetric):
             target_text = self.text_encoder.normalize_text(target_text)
             pred_text = self.text_encoder.ctc_beam_search_decode(
                 log_prob_vec[:length], beam_size=self.beam_size
-            )[0][0]
+            )
             cers.append(calc_cer(target_text=target_text, predicted_text=pred_text))
         return sum(cers) / len(cers)
