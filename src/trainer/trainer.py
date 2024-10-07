@@ -85,7 +85,8 @@ class Trainer(BaseTrainer):
             self.log_predictions(**batch)
 
     def log_spectrogram(self, spectrogram, **batch):
-        spectrogram_for_plot = spectrogram[0].detach().cpu()
+        # print(spectrogram[0].detach().cpu().permute(1, 0).size())
+        spectrogram_for_plot = spectrogram[0].detach().cpu().permute(1, 0)
         image = plot_spectrogram(spectrogram_for_plot)
         self.writer.add_image("spectrogram", image)
 
@@ -103,21 +104,46 @@ class Trainer(BaseTrainer):
         ]
         argmax_texts_raw = [self.text_encoder.decode(inds) for inds in argmax_inds]
         argmax_texts = [self.text_encoder.ctc_decode(inds) for inds in argmax_inds]
-        tuples = list(zip(argmax_texts, text, argmax_texts_raw, audio_path))
+
+        beam_search_results = [
+            self.text_encoder.ctc_beam_search_decode(
+                log_probs[i, : int(log_probs_length[i])]
+            )
+            for i in range(log_probs.size(0))
+        ]
+        # print(beam_search_results)
+
+        tuples = list(
+            zip(argmax_texts, beam_search_results, text, argmax_texts_raw, audio_path)
+        )
 
         rows = {}
-        for pred, target, raw_pred, audio_path in tuples[:examples_to_log]:
+        for (
+            argmax_pred,
+            beam_search_pred,
+            target,
+            argmax_raw_pred,
+            audio_path,
+        ) in tuples[:examples_to_log]:
             target = self.text_encoder.normalize_text(target)
-            wer = calc_wer(target, pred) * 100
-            cer = calc_cer(target, pred) * 100
+            argmax_wer = calc_wer(target, argmax_pred) * 100
+            argmax_cer = calc_cer(target, argmax_pred) * 100
+            beamsearch_wer = calc_wer(target, beam_search_pred[0]) * 100
+            beamsearch_cer = calc_cer(target, beam_search_pred[0]) * 100
+
+            print("pred:", beam_search_pred[0][0])
 
             rows[Path(audio_path).name] = {
                 "target": target,
-                "raw prediction": raw_pred,
-                "predictions": pred,
-                "wer": wer,
-                "cer": cer,
+                "raw prediction": argmax_raw_pred,
+                "predictions(argmax)": argmax_pred,
+                "wer(argmax)": argmax_wer,
+                "cer(argmax)": argmax_cer,
+                "predictions(beamsearch)": beam_search_pred[0],
+                "wer(beamsearch)": beamsearch_wer,
+                "cer(beamsearch)": beamsearch_cer,
             }
+
         self.writer.add_table(
             "predictions", pd.DataFrame.from_dict(rows, orient="index")
         )
