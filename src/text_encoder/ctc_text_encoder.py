@@ -2,7 +2,6 @@ import re
 from collections import defaultdict
 from string import ascii_lowercase
 
-import malaya_speech
 import torch
 from pyctcdecode import Alphabet, BeamSearchDecoderCTC
 
@@ -31,10 +30,7 @@ class CTCTextEncoder:
 
         self.ind2char = dict(enumerate(self.vocab))
         self.char2ind = {v: k for k, v in self.ind2char.items()}
-        self.lm = malaya_speech.language_model.gpt2(alpha=0.01, beta=0.2)
-        self.decoder_bs = BeamSearchDecoderCTC(
-            Alphabet(self.vocab, len(self.vocab)), self.lm
-        )
+        self.decoder_bs = BeamSearchDecoderCTC(Alphabet(self.vocab, False), None)
 
     def __len__(self):
         return len(self.vocab)
@@ -109,9 +105,7 @@ class CTCTextEncoder:
 
     def ctc_beam_search_decode(self, probs, beam_size=5):
         probs = probs.detach().cpu().numpy()
-        result = self.decoder_bs.decode_beams(probs, beam_size)
-        d_lm, _, _, _, _ = result[0]
-        return d_lm
+        return self.decoder_bs.decode(probs, beam_size)
 
     def _truncate_paths(self, dp, beam_size):
         return dict(sorted(list(dp.items(), key=lambda x: -x[1]))[:beam_size])
