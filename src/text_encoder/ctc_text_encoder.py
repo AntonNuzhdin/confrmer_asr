@@ -106,7 +106,7 @@ class CTCTextEncoder:
 
     def ctc_beam_search_decode(self, probs, beam_size=5):
         probs = probs.detach().cpu().numpy()
-        return self.decoder_no_lm.decode(probs, beam_size)
+        return self.beam_search_decoder.decode(probs, beam_size)
 
     def _truncate_paths(self, dp, beam_size):
         return dict(sorted(list(dp.items()), key=lambda x: -x[1])[:beam_size])
