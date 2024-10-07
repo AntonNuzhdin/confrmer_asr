@@ -3,7 +3,6 @@ from collections import defaultdict
 from string import ascii_lowercase
 
 import torch
-from pyctcdecode import Alphabet, BeamSearchDecoderCTC
 
 # TODO add CTC decode
 # TODO add BPE, LM, Beam Search support
@@ -27,11 +26,9 @@ class CTCTextEncoder:
 
         self.alphabet = alphabet
         self.vocab = [self.EMPTY_TOK] + list(self.alphabet)
+
         self.ind2char = dict(enumerate(self.vocab))
         self.char2ind = {v: k for k, v in self.ind2char.items()}
-        self.beam_search_decoder = BeamSearchDecoderCTC(
-            Alphabet(self.vocab, False), None
-        )
 
     def __len__(self):
         return len(self.vocab)
@@ -62,20 +59,18 @@ class CTCTextEncoder:
         """
         return "".join([self.ind2char[int(ind)] for ind in inds]).strip()
 
-    # from seminar
-    def ctc_decode(self, inds):
+    def ctc_decode(self, inds) -> str:
         decoded = []
-        last_char_ind = self.char2ind[self.EMPTY_TOK]
+        last_char = self.EMPTY_TOK
         for ind in inds:
-            if ind == last_char_ind:
+            if last_char == self.ind2char[ind]:
                 continue
-            elif ind != self.char2ind[self.EMPTY_TOK]:
+            if last_char != self.EMPTY_TOK:
                 decoded.append(self.ind2char[ind])
-            last_char_ind = ind
+            last_char = self.ind2char[ind]
         return "".join(decoded)
 
-    # from seminar
-    def ctc_beam_search_decode_slow(self, probs, beam_size=5):
+    def ctc_beam_search_decode(self, probs, beam_size):
         dp = {
             ("", self.EMPTY_TOK): 1.0,
         }
@@ -104,12 +99,8 @@ class CTCTextEncoder:
                 new_dp[(new_prefix, cur_char)] += v * next_token_prob
         return new_dp
 
-    def ctc_beam_search_decode(self, probs, beam_size=5):
-        probs = probs.detach().cpu().numpy()
-        return self.beam_search_decoder.decode(probs, beam_size)
-
     def _truncate_paths(self, dp, beam_size):
-        return dict(sorted(list(dp.items()), key=lambda x: -x[1])[:beam_size])
+        return dict(sorted(list(dp.items(), key=lambda x: -x[1]))[:beam_size])
 
     @staticmethod
     def normalize_text(text: str):

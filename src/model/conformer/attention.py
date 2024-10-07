@@ -25,6 +25,9 @@ class RelativeMultiHeadAttention(nn.Module):
         self.u = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
         self.v = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
 
+        torch.nn.init.xavier_uniform_(self.u)
+        torch.nn.init.xavier_uniform_(self.v)
+
         self.layer_norm = nn.LayerNorm(d_model)
 
         self.out_proj = nn.Linear(d_model, d_model)
