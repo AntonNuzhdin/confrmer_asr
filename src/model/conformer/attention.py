@@ -32,7 +32,7 @@ class RelativeMultiHeadAttention(nn.Module):
 
         self.out_proj = nn.Linear(d_model, d_model)
 
-    def forward(self, x, pos_embedding):
+    def forward(self, x, pos_embedding, mask):
         x = self.layer_norm(x)
         batch_size = x.size(0)
 
@@ -60,6 +60,12 @@ class RelativeMultiHeadAttention(nn.Module):
         pos_score = self._relative_positional_encoding(pos_score)
 
         score = (content_score + pos_score) / self.sqrt_dim
+
+        if mask is not None:
+            mask = mask.unsqueeze(1)
+            mask_value = -1e30 if score.dtype == torch.float32 else -1e4
+            score.masked_fill_(mask, mask_value)
+
         attn = F.softmax(score, -1)
         result = torch.matmul(attn, value).transpose(1, 2)
         result = result.contiguous().view(batch_size, -1, self.d_model)

@@ -37,7 +37,7 @@ class Conformer(nn.Module):
         )
 
     def forward(self, spectrogram, spectrogram_length, **batch):
-        x = self.decoder(self.encoder(spectrogram))
+        x = self.decoder(self.encoder(spectrogram, spectrogram_length))
         log_probs = F.log_softmax(x, dim=-1)
         log_probs_length = self._transform_input_lengths(spectrogram_length)
         return {

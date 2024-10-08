@@ -2,13 +2,13 @@ defaults:
   - model: conformer
   - writer: wandb
   - metrics: example
-  - datasets: onebatchtest
+  - datasets: librispeech
   - dataloader: example
   - transforms: example_only_instance
   - _self_
 optimizer:
   _target_: torch.optim.AdamW
-  lr: 3e-4
+  lr: 1e-3
 lr_scheduler:
   _target_: torch.optim.lr_scheduler.OneCycleLR
   max_lr: 0.00416

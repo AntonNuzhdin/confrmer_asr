@@ -41,11 +41,22 @@ class Encoder(nn.Module):
             ]
         )
 
-    def forward(self, x):
+    def forward(self, x, lengths):
+        mask = torch.ones(
+            (x.shape[0], x.shape[1], x.shape[1]), dtype=bool, device=lengths.device
+        )
+
         # [batch_size, freq, max_time]
         x = self.proj(x)
+
+        for i, l in enumerate(lengths):
+            mask[i, :, :l] = 0
+
+        mask = mask[:, :-2:2, :-2:2]
+        mask = mask[:, :-2:2, :-2:2]
+
         for conf_block in self.conformer_blocks:
-            x = conf_block(x)
+            x = conf_block(x, mask)
         return x
 
     @staticmethod
