@@ -81,6 +81,7 @@ class BaseDataset(Dataset):
         data_dict = self._index[ind]
         audio_path = data_dict["path"].split("dla_asr")[-1]
         # audio_path = data_dict["path"]
+        print(audio_path)
         audio = self.load_audio(audio_path)
         text = data_dict["text"]
         text_encoded = self.text_encoder.encode(text)
