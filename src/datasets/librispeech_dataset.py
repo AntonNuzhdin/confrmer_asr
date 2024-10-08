@@ -26,12 +26,11 @@ class LibrispeechDataset(BaseDataset):
         assert part in URL_LINKS or part == "train_all"
 
         if data_dir is None:
-            # ROOT_PATH / "data" / "datasets" / "librispeech"  #
-            data_dir = Path("/kaggle/input/data-clean/data/datasets/librispeech")
+            data_dir = (
+                ROOT_PATH / "data" / "datasets" / "librispeech"
+            )  # Path("/kaggle/tmp/data/datasets/librispeech")
             data_dir.mkdir(exist_ok=True, parents=True)
-
-        self._data_dir = Path("/kaggle/input/data-clean/data/datasets/librispeech")
-
+        self._data_dir = data_dir
         if part == "train_all":
             index = sum(
                 [
