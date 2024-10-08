@@ -110,6 +110,7 @@ class BaseDataset(Dataset):
     def load_audio(self, path):
         path = "/kaggle/input/data-clean/" + path.split("dla_asr")[-1]
         audio_tensor, sr = torchaudio.load(path)
+        print(path)
         audio_tensor = audio_tensor[0:1, :]  # remove all channels but the first
         target_sr = self.target_sr
         if sr != target_sr:
