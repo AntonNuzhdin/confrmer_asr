@@ -4,7 +4,7 @@ import torch.nn as nn
 
 # from DL-1 seminars
 class RelativePositionalEncoder(nn.Module):
-    def __init__(self, model_dim, max_len=5000):
+    def __init__(self, model_dim, max_len=8000):
         super().__init__()
         self.model_dim = model_dim
 
