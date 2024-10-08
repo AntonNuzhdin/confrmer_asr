@@ -81,7 +81,7 @@ class BaseDataset(Dataset):
         data_dict = self._index[ind]
         audio_path = "/kaggle/input/data-clean" + data_dict["path"].split("dla_asr")[-1]
         # audio_path = data_dict["path"]
-        print(audio_path)
+
         audio = self.load_audio(audio_path)
         text = data_dict["text"]
         text_encoded = self.text_encoder.encode(text)
@@ -110,7 +110,7 @@ class BaseDataset(Dataset):
         return len(self._index)
 
     def load_audio(self, path):
-        path = path.split("dla_asr")[-1]
+        path = "/kaggle/input/data-clean" + path.split("dla_asr")[-1]
         audio_tensor, sr = torchaudio.load(path)
         audio_tensor = audio_tensor[0:1, :]  # remove all channels but the first
         target_sr = self.target_sr
