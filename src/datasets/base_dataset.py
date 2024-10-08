@@ -79,9 +79,9 @@ class BaseDataset(Dataset):
                 (a single dataset element).
         """
         data_dict = self._index[ind]
-        audio_path = "/kaggle/input/data-clean" + data_dict["path"].split("dla_asr")[-1]
-        # audio_path = data_dict["path"]
+        audio_path = data_dict["path"]
         audio = self.load_audio(audio_path)
+        print(audio_path)
         text = data_dict["text"]
         text_encoded = self.text_encoder.encode(text)
 
