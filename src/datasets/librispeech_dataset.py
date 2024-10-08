@@ -29,7 +29,7 @@ class LibrispeechDataset(BaseDataset):
             # ROOT_PATH / "data" / "datasets" / "librispeech"  #
             data_dir = Path("/kaggle/input/data-clean/data/datasets/librispeech")
             data_dir.mkdir(exist_ok=True, parents=True)
-        self._data_dir = data_dir
+        self._data_dir = Path("/kaggle/input/data-clean/data/datasets/librispeech")
         if part == "train_all":
             index = sum(
                 [
