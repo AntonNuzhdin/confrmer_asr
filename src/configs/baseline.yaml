@@ -1,8 +1,8 @@
 defaults:
-  - model: conformer
+  - model: deepspeech
   - writer: wandb
   - metrics: example
-  - datasets: librispeech
+  - datasets: onebatchtest
   - dataloader: example
   - transforms: example_only_instance
   - _self_

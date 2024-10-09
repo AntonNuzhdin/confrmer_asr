@@ -20,6 +20,5 @@ class ConvolutionSubsampling(nn.Module):
 
     def forward(self, x):
         # x - [bs, freq, time]
-        x = self.subsampling(x.unsqueeze(1))
-        x = x.permute(0, 2, 1, 3)
+        x = self.subsampling(x.unsqueeze(1)).permute(0, 2, 1, 3)
         return x.contiguous().view(x.size(0), x.size(1), -1)
