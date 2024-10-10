@@ -21,7 +21,7 @@ class Conv2dModule(nn.Module):
                 out_channels=32,
                 kernel_size=kernel_size2,
                 padding=self._get_padding_size(kernel_size2),
-                stride=(2, 2),
+                stride=(2, 1),
             ),
             nn.BatchNorm2d(32),
             nn.ReLU(),

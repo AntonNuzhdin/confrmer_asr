@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -59,7 +60,7 @@ class DeepSpeech2(nn.Module):
         x = x.unsqueeze(1)
         x = self.conv2dModule(x)
         spec_length = self._get_seq_lens(spec_length)
-
+        x = self._apply_mask(x, spec_length)
         batch_size, channels, freq_size, time_steps = x.size()
         x = x.permute(0, 3, 1, 2).contiguous()
         x = x.view(batch_size, time_steps, channels * freq_size)
@@ -81,6 +82,14 @@ class DeepSpeech2(nn.Module):
                 kernel, stride, padding = m.kernel_size[1], m.stride[1], m.padding[1]
                 seq_lengths = ((seq_lengths + 2 * padding - kernel) // stride) + 1
         return seq_lengths.int()
+
+    def _apply_mask(self, x, lengths):
+        bs, _, _, time = x.size()
+        mask = torch.arange(time, device=x.device).view(1, 1, 1, time) >= lengths.view(
+            bs, 1, 1, 1
+        )
+        x = x.masked_fill(mask, 0)
+        return x
 
     @staticmethod
     def _get_dim_after_conv2d(features_in, kernel_size, stride, padding):

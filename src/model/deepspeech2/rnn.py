@@ -24,7 +24,7 @@ class RNNModule(nn.Module):
         x = x.transpose(1, 2)
 
         x_packed = nn.utils.rnn.pack_padded_sequence(
-            x, seq_lengths.cpu(), batch_first=True, enforce_sorted=False
+            x, seq_lengths.cpu(), batch_first=True
         )
         x_packed, _ = self.rnn(x_packed)
         x, _ = nn.utils.rnn.pad_packed_sequence(x_packed, batch_first=True)
