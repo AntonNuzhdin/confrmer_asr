@@ -14,7 +14,7 @@ class DeepSpeech2(nn.Module):
         kernel_size2=(21, 11),
         kernel_size3=(21, 11),
         hidden_size=512,
-        dropout=0.1,
+        dropout=0.0,
         rnn_layers=5,
     ):
         super().__init__()
@@ -47,11 +47,11 @@ class DeepSpeech2(nn.Module):
         for _ in range(rnn_layers - 1):
             self.rnn.append(
                 RNNModule(
-                    input_size=hidden_size * 2, hidden_size=hidden_size, dropout=dropout
+                    input_size=hidden_size, hidden_size=hidden_size, dropout=dropout
                 )
             )
 
-        self.linear = nn.Linear(in_features=hidden_size * 2, out_features=vocab_size)
+        self.linear = nn.Linear(in_features=hidden_size, out_features=vocab_size)
 
     def forward(self, spectrogram, spectrogram_length, **batch):
         x = spectrogram.permute(0, 2, 1)
@@ -84,4 +84,4 @@ class DeepSpeech2(nn.Module):
 
     @staticmethod
     def _get_dim_after_conv2d(features_in, kernel_size, stride, padding):
-        return ((features_in + 2 * padding - kernel_size) // stride) + 1
+        return ((features_in + 2 * padding - (kernel_size - 1) - 1) // stride) + 1

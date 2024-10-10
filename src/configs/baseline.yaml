@@ -9,7 +9,6 @@ defaults:
 optimizer:
   _target_: torch.optim.AdamW
   lr: 3e-4
-  weight_decay: 1e-3
 lr_scheduler:
   _target_: torch.optim.lr_scheduler.OneCycleLR
   max_lr: 5e-4
