@@ -87,7 +87,7 @@ class DeepSpeech2(nn.Module):
         bs, _, _, time = x.size()
         mask = torch.arange(time, device=x.device).view(1, 1, 1, time) >= lengths.view(
             bs, 1, 1, 1
-        )
+        ).to(x.device)
         x = x.masked_fill(mask, 0)
         return x
 
