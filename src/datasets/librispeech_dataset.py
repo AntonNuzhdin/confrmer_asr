@@ -20,10 +20,17 @@ URL_LINKS = {
     "train-other-500": "https://www.openslr.org/resources/12/train-other-500.tar.gz",
 }
 
+URL_LINKS_CLEAN = {
+    "dev-clean": "https://www.openslr.org/resources/12/dev-clean.tar.gz",
+    "test-clean": "https://www.openslr.org/resources/12/test-clean.tar.gz",
+    "train-clean-100": "https://www.openslr.org/resources/12/train-clean-100.tar.gz",
+    "train-clean-360": "https://www.openslr.org/resources/12/train-clean-360.tar.gz",
+}
+
 
 class LibrispeechDataset(BaseDataset):
     def __init__(self, part, data_dir=None, *args, **kwargs):
-        assert part in URL_LINKS or part == "train_all"
+        assert part in URL_LINKS or part == "train_all" or "train_clean_all"
 
         if data_dir is None:
             data_dir = (
@@ -36,6 +43,15 @@ class LibrispeechDataset(BaseDataset):
                 [
                     self._get_or_load_index(part)
                     for part in URL_LINKS
+                    if "train" in part
+                ],
+                [],
+            )
+        elif part == "train_clean_all":
+            index = sum(
+                [
+                    self._get_or_load_index(part)
+                    for part in URL_LINKS_CLEAN
                     if "train" in part
                 ],
                 [],
