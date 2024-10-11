@@ -6,6 +6,23 @@ train:
     _target_: torchvision.transforms.v2.Compose
     transforms:
       - _target_: src.transforms.wav_augs.Gain
+      - _target_: src.transforms.wav_augs.ColorNoiseAug
+        p: 0.5
+        sample_rate: 16000
+      - _target_: src.transforms.wav_augs.PitchShiftAug
+        sample_rate: 16000
+      - _target_: src.transforms.wav_augs.HighPassFilterAug
+        p: 0.2
+        min_cutoff_freq: 500
+        max_cutoff_freq: 800
+        sample_rate: 16000
+      - _target_: src.transforms.wav_augs.LowPassFilterAug
+        p: 0.2
+        min_cutoff_freq: 800
+        max_cutoff_freq: 1500
+        sample_rate: 16000
+
+
 inference:
   get_spectrogram:
     _target_: torchaudio.transforms.MelSpectrogram

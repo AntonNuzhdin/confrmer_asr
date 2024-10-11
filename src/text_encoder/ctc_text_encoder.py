@@ -94,7 +94,6 @@ class CTCTextEncoder:
             for (prefix, last_char), v in dp.items():
                 if last_char == cur_char:
                     new_prefix = prefix
-                    continue
                 else:
                     if cur_char != self.EMPTY_TOK:
                         new_prefix = prefix + cur_char
