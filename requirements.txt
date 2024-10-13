@@ -16,7 +16,6 @@ wget
 kenlm
 gdown
 OmegaConf
-json
 
 black
 isort
