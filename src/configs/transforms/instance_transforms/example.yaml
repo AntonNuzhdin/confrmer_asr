@@ -7,17 +7,17 @@ train:
     transforms:
       - _target_: src.transforms.wav_augs.Gain
       - _target_: src.transforms.wav_augs.ColorNoiseAug
-        p: 0.5
+        p: 0.6
         sample_rate: 16000
       - _target_: src.transforms.wav_augs.PitchShiftAug
         sample_rate: 16000
       - _target_: src.transforms.wav_augs.HighPassFilterAug
-        p: 0.2
+        p: 0.3
         min_cutoff_freq: 300
         max_cutoff_freq: 1000
         sample_rate: 16000
       - _target_: src.transforms.wav_augs.LowPassFilterAug
-        p: 0.2
+        p: 0.3
         min_cutoff_freq: 800
         max_cutoff_freq: 2000
         sample_rate: 16000

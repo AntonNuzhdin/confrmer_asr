@@ -6,5 +6,5 @@ train:
         time_mask_param: 30
         p: 0.2
       - _target_: src.transforms.spec_augs.FrequencyMaskingAug
-        freq_mask_param: 35
+        freq_mask_param: 40
         p: 0.9

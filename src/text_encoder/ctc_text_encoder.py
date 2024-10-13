@@ -74,7 +74,9 @@ class CTCTextEncoder:
             last_char = cur_char
         return "".join(decoded)
 
-    def ctc_beam_search_decode_slow(self, probs, beam_size):
+    # from seminar
+    def ctc_beam_search_decode_slow(self, probs, beam_size=5):
+        probs = torch.exp(probs)
         dp = {
             ("", self.EMPTY_TOK): 1.0,
         }
@@ -85,7 +87,7 @@ class CTCTextEncoder:
             (prefix, proba)
             for (prefix, _), proba in sorted(dp.items(), key=lambda x: -x[1])
         ]
-        return dp
+        return dp[0][0]
 
     def _expand_and_merge_path(self, dp, next_token_probs):
         new_dp = defaultdict(float)
@@ -107,7 +109,7 @@ class CTCTextEncoder:
         return self.decoder_bs.decode(probs, beam_size)
 
     def _truncate_paths(self, dp, beam_size):
-        return dict(sorted(list(dp.items(), key=lambda x: -x[1]))[:beam_size])
+        return dict(sorted(list(dp.items()), key=lambda x: -x[1])[:beam_size])
 
     @staticmethod
     def normalize_text(text: str):
