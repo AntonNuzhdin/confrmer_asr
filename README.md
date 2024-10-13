@@ -8,7 +8,8 @@
   <a href="#license">License</a>
 </p>
 
-(WanDB report)[https://api.wandb.ai/links/anthonnuzhdin/nrmc2nkh]
+[WanDB report](https://api.wandb.ai/links/anthonnuzhdin/nrmc2nkh)
+
 ## About
 
 This repo is my own implementation of DeepSpeech2 ASR model
