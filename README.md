@@ -10,9 +10,7 @@
 
 ## About
 
-This repository contains a template for solving ASR task with PyTorch. This template branch is a part of the [HSE DLA course](https://github.com/markovka17/dla) ASR homework. Some parts of the code are missing (or do not follow the most optimal design choices...) and students are required to fill these parts themselves (as well as writing their own models, etc.).
-
-See the task assignment [here](https://github.com/markovka17/dla/tree/2024/hw1_asr).
+This repo is my own implementation of DeepSpeech2 ASR model
 
 ## Installation
 
@@ -24,23 +22,10 @@ Follow these steps to install the project:
 
    ```bash
    # create env
-   conda create -n project_env python=PYTHON_VERSION
+   conda create -n asr python=3.11
 
    # activate env
-   conda activate project_env
-   ```
-
-   b. `venv` (`+pyenv`) version:
-
-   ```bash
-   # create env
-   ~/.pyenv/versions/PYTHON_VERSION/bin/python3 -m venv project_env
-
-   # alternatively, using default python version
-   python3 -m venv project_env
-
-   # activate env
-   source project_env
+   conda activate asr
    ```
 
 1. Install all required packages
