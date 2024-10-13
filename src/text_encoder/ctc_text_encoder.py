@@ -3,7 +3,7 @@ from collections import defaultdict
 from string import ascii_lowercase
 
 import torch
-from pyctcdecode import Alphabet, BeamSearchDecoderCTC
+from pyctcdecode import Alphabet, BeamSearchDecoderCTC, build_ctcdecoder
 
 # TODO add CTC decode
 # TODO add BPE, LM, Beam Search support
@@ -15,7 +15,9 @@ from pyctcdecode import Alphabet, BeamSearchDecoderCTC
 class CTCTextEncoder:
     EMPTY_TOK = ""
 
-    def __init__(self, alphabet=None, **kwargs):
+    def __init__(
+        self, alphabet=None, language_model_path=None, alphabet_path=None, **kwargs
+    ):
         """
         Args:
             alphabet (list): alphabet for language. If None, it will be
@@ -28,9 +30,21 @@ class CTCTextEncoder:
         self.alphabet = alphabet
         self.vocab = [self.EMPTY_TOK] + list(self.alphabet)
 
+        if alphabet_path:
+            with open(alphabet_path) as file:
+                alph = [sym.lower() for sym in file.read().strip().split("\n")]
+
         self.ind2char = dict(enumerate(self.vocab))
         self.char2ind = {v: k for k, v in self.ind2char.items()}
-        self.decoder_bs = BeamSearchDecoderCTC(Alphabet(self.vocab, False), None)
+        print(language_model_path, alphabet_path)
+        if language_model_path:
+            self.decoder_bs = build_ctcdecoder(
+                labels=self.vocab,
+                kenlm_model_path=language_model_path,
+                unigrams=alph,
+            )
+        else:
+            self.decoder_bs = BeamSearchDecoderCTC(Alphabet(self.vocab, False), None)
 
     def __len__(self):
         return len(self.vocab)

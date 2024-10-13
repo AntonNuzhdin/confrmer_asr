@@ -20,6 +20,8 @@ loss_function:
   _target_: src.loss.CTCLossWrapper
 text_encoder:
   _target_: src.text_encoder.CTCTextEncoder
+  language_model_path: /Users/antonnuzhdin/Downloads/lm_lower.arpa
+  alphabet_path: /Users/antonnuzhdin/Downloads/lm.arpa
 trainer:
   log_step: 50
   n_epochs: 50

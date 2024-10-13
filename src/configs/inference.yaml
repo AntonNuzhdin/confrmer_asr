@@ -13,3 +13,5 @@ inferencer:
   from_pretrained: "/Users/antonnuzhdin/Downloads/asr.pth" # path to the pretrained model
 text_encoder:
   _target_: src.text_encoder.CTCTextEncoder
+  language_model_path: /Users/antonnuzhdin/Downloads/lm_lower.arpa
+  alphabet_path: /Users/antonnuzhdin/Downloads/lm_vocab.txt
