@@ -1,5 +1,5 @@
-import re
 import os
+import re
 from collections import defaultdict
 from string import ascii_lowercase
 
@@ -24,10 +24,12 @@ class CTCTextEncoder:
             alphabet (list): alphabet for language. If None, it will be
                 set to ascii
         """
-        lm_lowercase_path = os.path.join(os.path.dirname(language_model_path), 'lm_lowercase.arpa')
+        lm_lowercase_path = os.path.join(
+            os.path.dirname(language_model_path), "lm_lowercase.arpa"
+        )
         if not os.path.exists(lm_lowercase_path):
-            with open(language_model_path, 'r') as f_upper:
-                with open(lm_lowercase_path, 'w') as f_lower:
+            with open(language_model_path, "r") as f_upper:
+                with open(lm_lowercase_path, "w") as f_lower:
                     for line in f_upper:
                         f_lower.write(line.lower())
 
@@ -47,7 +49,7 @@ class CTCTextEncoder:
         if language_model_path:
             self.decoder_bs = build_ctcdecoder(
                 labels=self.vocab,
-                kenlm_model_path=language_model_path,
+                kenlm_model_path=lm_lowercase_path,
                 unigrams=alph,
             )
         else:
