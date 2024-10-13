@@ -18,7 +18,7 @@ This repo is my own implementation of DeepSpeech2 ASR model
 
 Follow these steps to install the project:
 
-0. (Optional) Create and activate new environment using [`conda`](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html) or `venv` ([`+pyenv`](https://github.com/pyenv/pyenv)).
+0. Create and activate new environment using [`conda`](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html).
 
    a. `conda` version:
 
