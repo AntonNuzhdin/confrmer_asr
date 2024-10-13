@@ -6,12 +6,6 @@ from string import ascii_lowercase
 import torch
 from pyctcdecode import Alphabet, BeamSearchDecoderCTC, build_ctcdecoder
 
-# TODO add CTC decode
-# TODO add BPE, LM, Beam Search support
-# Note: think about metrics and encoder
-# The design can be remarkably improved
-# to calculate stuff more efficiently and prettier
-
 
 class CTCTextEncoder:
     EMPTY_TOK = ""
@@ -24,14 +18,9 @@ class CTCTextEncoder:
             alphabet (list): alphabet for language. If None, it will be
                 set to ascii
         """
-        lm_lowercase_path = os.path.join(
-            os.path.dirname(language_model_path), "lm_lowercase.arpa"
-        )
-        if not os.path.exists(lm_lowercase_path):
-            with open(language_model_path, "r") as f_upper:
-                with open(lm_lowercase_path, "w") as f_lower:
-                    for line in f_upper:
-                        f_lower.write(line.lower())
+        self.lm_path = language_model_path
+
+        lm_lowercase_path = self.__convert_kenlm()
 
         if alphabet is None:
             alphabet = list(ascii_lowercase + " ")
@@ -45,7 +34,7 @@ class CTCTextEncoder:
 
         self.ind2char = dict(enumerate(self.vocab))
         self.char2ind = {v: k for k, v in self.ind2char.items()}
-        print(language_model_path, alphabet_path)
+
         if language_model_path:
             self.decoder_bs = build_ctcdecoder(
                 labels=self.vocab,
@@ -54,6 +43,17 @@ class CTCTextEncoder:
             )
         else:
             self.decoder_bs = BeamSearchDecoderCTC(Alphabet(self.vocab, False), None)
+
+    def __convert_kenlm(self):
+        lm_lowercase_path = os.path.join(
+            os.path.dirname(self.lm_path), "lm_lowercase.arpa"
+        )
+        if not os.path.exists(lm_lowercase_path):
+            with open(self.lm_path, "r") as f_upper:
+                with open(lm_lowercase_path, "w") as f_lower:
+                    for line in f_upper:
+                        f_lower.write(line.lower())
+        return lm_lowercase_path
 
     def __len__(self):
         return len(self.vocab)

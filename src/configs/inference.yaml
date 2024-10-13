@@ -8,10 +8,10 @@ defaults:
 inferencer:
   device_tensors: ["spectrogram", "text_encoded"] # which tensors should be on device (ex. GPU)
   device: auto # device name or "auto"
-  save_path: "prediction" # any name here, can be a dataset name
+  save_path: prediction # any name here, can be a dataset name
   seed: 1
-  from_pretrained: "/Users/antonnuzhdin/Downloads/asr.pth" # path to the pretrained model
+  from_pretrained: src/model_weights/model_best.pth # path to the pretrained model
 text_encoder:
   _target_: src.text_encoder.CTCTextEncoder
-  language_model_path: /Users/antonnuzhdin/Downloads/lm_lower.arpa
-  alphabet_path: /Users/antonnuzhdin/Downloads/lm_vocab.txt
+  language_model_path: src/language_model/lm.arpa
+  alphabet_path: src/language_model/lm_vocab.txt
