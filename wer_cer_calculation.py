@@ -3,9 +3,6 @@ import json
 import os
 from pathlib import Path
 
-import hydra
-from omegaconf import OmegaConf
-
 from src.metrics.utils import calc_cer, calc_wer
 from src.text_encoder.ctc_text_encoder import CTCTextEncoder
 
@@ -23,18 +20,14 @@ def cer_wer(dir_path_pred, dir_path_gt):
         file_name = Path(audio_file).stem
 
         text_file_path = Path(dir_path_gt) / f"{file_name}.txt"
+        with open(text_file_path, "r", encoding="utf-8") as file:
+            original_text = file.read()
+        original_text = CTCTextEncoder.normalize_text(original_text)
+        predicted_text = prediction_data["text_predicted"].strip()
 
-        if text_file_path.exists():
-            with open(text_file_path, "r", encoding="utf-8") as file:
-                original_text = file.read()
-            original_text = CTCTextEncoder.normalize_text(original_text)
-            predicted_text = prediction_data["text_predicted"].strip()
-
-            cer += calc_cer(original_text, predicted_text)
-            wer += calc_wer(original_text, predicted_text)
-            cnt += 1
-        else:
-            print(f"Text file for {file_name} not found!")
+        cer += calc_cer(original_text, predicted_text)
+        wer += calc_wer(original_text, predicted_text)
+        cnt += 1
 
     print("WER: {:.4f}".format(wer / cnt))
     print("CER: {:.4f}".format(cer / cnt))
