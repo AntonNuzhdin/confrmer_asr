@@ -1,14 +1,14 @@
 defaults:
   - model: deepspeech
   - metrics: example
-  - datasets: inference_test # we do not want to run inference on training data
+  - datasets: inference_custom_dataset
   - dataloader: example
   - transforms: example_only_instance
   - _self_
 inferencer:
   device_tensors: ["spectrogram", "text_encoded"] # which tensors should be on device (ex. GPU)
   device: auto # device name or "auto"
-  save_path: "pretiction" # any name here, can be a dataset name
+  save_path: "prediction" # any name here, can be a dataset name
   seed: 1
   from_pretrained: "/Users/antonnuzhdin/Downloads/asr.pth" # path to the pretrained model
 text_encoder:

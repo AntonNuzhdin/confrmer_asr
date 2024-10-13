@@ -1,4 +1,5 @@
 import json
+import logging
 
 import torch
 from tqdm.auto import tqdm
@@ -64,6 +65,7 @@ class Inferencer(BaseTrainer):
         self.batch_transforms = batch_transforms
 
         self.text_encoder = text_encoder
+        self.logger_print = logging.getLogger(__name__)
 
         # define dataloaders
         self.evaluation_dataloaders = {k: v for k, v in dataloaders.items()}
@@ -122,8 +124,6 @@ class Inferencer(BaseTrainer):
                 the dataloader (possibly transformed via batch transform)
                 and model outputs.
         """
-        # TODO change inference logic so it suits ASR assignment
-        # and task pipeline
 
         batch = self.move_batch_to_device(batch)
         batch = self.transform_batch(batch)  # transform batch on device -- faster
@@ -131,12 +131,13 @@ class Inferencer(BaseTrainer):
         outputs = self.model(**batch)
         batch.update(outputs)
 
+        if batch["text"] == ["" for i in range(len(batch["text"]))]:
+            self.logger_print.warning(
+                "there is no ground truth text for audio, metrics is not correct"
+            )
         if metrics is not None:
             for met in self.metrics["inference"]:
                 metrics.update(met.name, met(**batch))
-
-        # Some saving logic. This is an example
-        # Use if you need to save predictions on disk
 
         batch_size = batch["log_probs"].shape[0]
         # current_id = batch_idx * batch_size
@@ -156,7 +157,6 @@ class Inferencer(BaseTrainer):
 
             predictions[wav_name] = {"text_predicted": text_predicted}
 
-        print(f"save predictions to {self.save_path / part}...")
         if self.save_path is not None:
             save_dir = self.save_path / part
             save_dir.mkdir(parents=True, exist_ok=True)
@@ -172,7 +172,7 @@ class Inferencer(BaseTrainer):
 
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(existing_predictions, f, ensure_ascii=False, indent=4)
-            print(f"saved predictions to {self.save_path / part}")
+            self.logger_print.info(f"saved predictions to {self.save_path / part}")
         return batch
 
     def _inference_part(self, part, dataloader):
