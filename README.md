@@ -39,6 +39,13 @@ Follow these steps to install the project:
    pre-commit install
    ```
 
+2. Dowload model weights:
+   ```bash
+   cd deepspeech2
+   
+   python download.py
+   ```
+
 ## How To Use
 
 To train a model, run the following command:
@@ -53,6 +60,11 @@ To run inference (evaluate the model or save predictions):
 
 ```bash
 python3 inference.py HYDRA_CONFIG_ARGUMENTS
+```
+
+To evaluate WER and CER on your predictions, simply run
+```bash
+python wer_cer_calculation.py --dir_path_gt <Path to ground truth folder with .txt> --dir_path_pred <Path to dir with predicions>
 ```
 
 ## Credits
