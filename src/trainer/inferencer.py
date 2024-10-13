@@ -156,6 +156,7 @@ class Inferencer(BaseTrainer):
 
             predictions[wav_name] = {"text_predicted": text_predicted}
 
+        print(f"save predictions to {self.save_path / part}...")
         if self.save_path is not None:
             save_dir = self.save_path / part
             save_dir.mkdir(parents=True, exist_ok=True)
@@ -171,6 +172,7 @@ class Inferencer(BaseTrainer):
 
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(existing_predictions, f, ensure_ascii=False, indent=4)
+            print(f"saved predictions to {self.save_path / part}")
         return batch
 
     def _inference_part(self, part, dataloader):
