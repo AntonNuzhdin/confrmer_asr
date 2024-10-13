@@ -1,3 +1,5 @@
+import json
+
 import torch
 from tqdm.auto import tqdm
 
@@ -136,27 +138,39 @@ class Inferencer(BaseTrainer):
         # Some saving logic. This is an example
         # Use if you need to save predictions on disk
 
-        batch_size = batch["logits"].shape[0]
-        current_id = batch_idx * batch_size
+        batch_size = batch["log_probs"].shape[0]
+        # current_id = batch_idx * batch_size
+
+        predictions = {}
 
         for i in range(batch_size):
             # clone because of
             # https://github.com/pytorch/pytorch/issues/1995
-            logits = batch["logits"][i].clone()
-            label = batch["labels"][i].clone()
-            pred_label = logits.argmax(dim=-1)
+            length = batch["log_probs_length"][i].clone()
+            log_probs = batch["log_probs"][i].clone()
+            text_predicted = self.text_encoder.ctc_beam_search_decode(
+                log_probs[:length]
+            )
 
-            output_id = current_id + i
+            wav_name = batch["audio_path"][i]
 
-            output = {
-                "pred_label": pred_label,
-                "label": label,
-            }
+            predictions[wav_name] = {"text_predicted": text_predicted}
 
-            if self.save_path is not None:
-                # you can use safetensors or other lib here
-                torch.save(output, self.save_path / part / f"output_{output_id}.pth")
+        if self.save_path is not None:
+            save_dir = self.save_path / part
+            save_dir.mkdir(parents=True, exist_ok=True)
 
+            output_file = save_dir / "predictions.json"
+
+            if output_file.exists():
+                with open(output_file, "r", encoding="utf-8") as f:
+                    existing_predictions = json.load(f)
+                existing_predictions.update(predictions)
+            else:
+                existing_predictions = predictions
+
+            with open(output_file, "w", encoding="utf-8") as f:
+                json.dump(existing_predictions, f, ensure_ascii=False, indent=4)
         return batch
 
     def _inference_part(self, part, dataloader):
